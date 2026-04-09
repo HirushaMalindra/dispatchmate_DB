@@ -1,0 +1,129 @@
+CREATE DATABASE dispatch_mate_db;
+USE dispatch_mate_db;
+
+
+CREATE TABLE students (
+    reg_number VARCHAR(20) PRIMARY KEY,
+    full_name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    academic_year VARCHAR(10),
+    password_hash VARCHAR(255) NOT NULL
+);
+
+
+CREATE TABLE staff (
+    staff_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    role ENUM('Admin', 'Staff') DEFAULT 'Staff',
+    password_hash VARCHAR(255) NOT NULL
+);
+
+
+CREATE TABLE books (
+    book_id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    module_code VARCHAR(20) NOT NULL UNIQUE,
+    current_stock INT DEFAULT 0,
+    status ENUM('Available', 'Out of Stock') DEFAULT 'Available'
+);
+
+
+CREATE TABLE time_slots (
+    slot_id INT AUTO_INCREMENT PRIMARY KEY,
+    slot_date DATE NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    max_capacity INT NOT NULL,
+    current_bookings INT DEFAULT 0
+);
+
+CREATE TABLE tokens (
+    token_id INT AUTO_INCREMENT PRIMARY KEY,
+    student_reg_number VARCHAR(20),
+    slot_id INT,
+    token_string VARCHAR(100) UNIQUE NOT NULL,
+    is_used BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (student_reg_number) REFERENCES students(reg_number) ON DELETE CASCADE,
+    FOREIGN KEY (slot_id) REFERENCES time_slots(slot_id) ON DELETE SET NULL
+);
+
+CREATE TABLE restock_alerts (
+    alert_id INT AUTO_INCREMENT PRIMARY KEY,
+    student_reg_number VARCHAR(20),
+    book_id INT,
+    alert_status ENUM('Pending', 'Notified') DEFAULT 'Pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (student_reg_number) REFERENCES students(reg_number) ON DELETE CASCADE,
+    FOREIGN KEY (book_id) REFERENCES books(book_id) ON DELETE CASCADE
+);
+
+CREATE TABLE student_enrollments (
+    enrollment_id INT AUTO_INCREMENT PRIMARY KEY,
+    student_reg_number VARCHAR(20),
+    module_code VARCHAR(20),
+    is_collected BOOLEAN DEFAULT FALSE, 
+    FOREIGN KEY (student_reg_number) REFERENCES students(reg_number) ON DELETE CASCADE,
+    FOREIGN KEY (module_code) REFERENCES books(module_code) ON DELETE CASCADE
+);
+
+INSERT INTO students (reg_number, full_name, email, academic_year, password_hash) 
+VALUES ('526774619', 'Hirusha Perera', 'hirushamalindra@1gmail.com', '26/27', 'user1'),
+	   ('426783622', 'Dinesh Perera', 'dineshpererasmart5@gmail.com', '26/27', 'user2'),
+       ('726775416', 'kavidu Kumara', 's25008097@ousl.lk','26/27', 'user3'),
+       ('226775413', 'Devini Dilshara', 'devini12@gmail.com', '26/27', 'user4'),
+       ('526774276', 'Purandi Sarasavi Thathsarani', 's24007381@ousl.lk', '26/27', 'user5'),
+       ('726774259', 'Sajani Dewmini', 's24007358@ousl.lk', '26/27', 'user6'),
+       ('326775674', 'Malshani', 's24007366@ousl.lk', '26/27', 'user7');
+       
+INSERT INTO staff (name, email, role, password_hash) 
+VALUES  ('user1', 'admin@ousl.lk', 'Admin', '01'),
+		('user2', 'user@ousl.lk', 'Staff', '02');
+
+INSERT INTO books (title, module_code, current_stock, status)
+VALUES  ('Database Management Systems', 'COU3301', '20', 'Available'),
+		('Fundamentals of Programming', 'COU3304', '50', 'Available'),
+        ('System Analysis and Design', 'COU3202', '0', 'Out of Stock'),
+        ('Software Engineering', 'COU3303', '0', 'Out of Stock'),
+        ('IT Organization', 'SU3201', '30', 'Available'),
+        ('Fundamentals of Information Systems', 'ISU3300', '0', 'Out of Stock');
+        
+INSERT INTO time_slots (slot_id,slot_date, start_time, end_time, max_capacity)
+VALUES 		('01', '2026-05-12', '09:00:00', '10:00:00', '30'),
+			('02', '2026-05-12', '10:00:00', '11:00:00', '30'),
+            ('03', '2026-05-12', '11:00:00', '11:45:00', '15'),
+            ('04', '2026-05-12', '12:45:00', '13:30:00', '35'),
+            ('05', '2026-05-12', '13:30:00', '14:30:00', '30'),
+            ('06', '2026-05-12', '14:30:00', '16:00:00', '40');
+            
+INSERT INTO tokens (student_reg_number, slot_id, token_string)
+VALUES 		('526774619', '01', 'TK-ABC-12345'),
+			('426783622', '02', 'TK-XYZ-98765'),
+            ('726775416', '03', 'TK-LMN-54321');
+
+INSERT INTO restock_alerts (student_reg_number, book_id)
+VALUES		('526774619', 1),
+			('426783622', 1),
+            ('726775416', 2);
+            
+INSERT INTO student_enrollments (student_reg_number, module_code,is_collected)           
+ VALUES 	('526774619', 'COU3304', FALSE ),
+			('526774619', 'COU3303',  FALSE),
+            ('526774276', 'COU3304', TRUE),
+            ('526774276', 'ISU3300', FALSE),
+            ('726775416','COU3202', TRUE ),
+            ('226775413', 'COU3304', FALSE );
+            
+
+            
+
+            
+            
+
+
+
+
+
+
+
+
