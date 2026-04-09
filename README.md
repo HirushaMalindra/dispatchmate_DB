@@ -10,4 +10,4 @@ If you need to move this to another laptop:
 
   3.Select "Import from Self-Contained File" and pick your .sql file.
 
-  4,Click Start Import.
+  4.Click Start Import.
